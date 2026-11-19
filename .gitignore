@@ -1,0 +1,12 @@
+node_modules
+dist
+dev-dist
+.env
+.env.local
+.firebase
+functions/lib
+functions/node_modules
+test-results
+playwright-report
+*.log
+.DS_Store
