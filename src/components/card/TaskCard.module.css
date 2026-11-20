@@ -1,0 +1,238 @@
+/*
+ * Notion calendar card. Calendar-sized variants read the --cal-card-* tokens so a compact grid
+ * (which overrides those tokens) restyles every card, bar and overlay inside it automatically.
+ */
+.card {
+  --tc-font: var(--cal-card-font);
+  --tc-line: var(--cal-card-line);
+  --tc-pad-y: var(--cal-card-pad-y);
+  --tc-pad-x: var(--cal-card-pad-x);
+  --tc-radius: var(--radius);
+  --tc-meta-font: 12px;
+  --tc-meta-line: 16px;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--tc-pad-y) var(--tc-pad-x);
+  border-radius: var(--tc-radius);
+  background: var(--bg-card);
+  box-shadow: var(--card-shadow);
+  color: var(--text);
+  font-size: var(--tc-font);
+  line-height: var(--tc-line);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease),
+    opacity var(--dur-fast) var(--ease);
+  outline: none;
+}
+
+@media (hover: hover) {
+  .card:hover {
+    background: var(--bg-card-hover);
+    box-shadow: var(--card-shadow-hover);
+  }
+}
+
+.card:focus-visible {
+  box-shadow:
+    var(--card-shadow),
+    var(--focus-ring);
+}
+
+/* ---- variants ---- */
+.calendar {
+  margin: 0 var(--cal-cell-pad-x) var(--cal-card-gap);
+}
+
+.compact {
+  margin: 0 2px 2px;
+}
+
+.compactMetrics {
+  --tc-font: 11px;
+  --tc-line: 13px;
+  --tc-pad-y: 2px;
+  --tc-pad-x: 4px;
+  --tc-radius: var(--radius-sm);
+  --tc-meta-font: 10px;
+  --tc-meta-line: 12px;
+  /* Narrow phone cells: hyphenate long words instead of splitting them bare. */
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  /* …but only long words (≥7 chars, 3+ each side) — "re-view" next to a free line reads worse. */
+  hyphenate-limit-chars: 7 3 3;
+  -webkit-hyphenate-limit-before: 3;
+  -webkit-hyphenate-limit-after: 3;
+}
+
+.inbox {
+  --tc-font: 14px;
+  --tc-line: 20px;
+  --tc-pad-y: 4px;
+  --tc-pad-x: 8px;
+  width: 100%;
+  margin: 0 0 6px;
+}
+
+.bar {
+  justify-content: center;
+  height: calc(var(--cal-lane-h) - var(--cal-card-gap));
+  margin: 0 var(--cal-cell-pad-x);
+  padding-top: 0;
+  padding-bottom: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.bar.compactMetrics {
+  height: calc(var(--tc-line) + 2 * var(--tc-pad-y));
+  margin: 0 2px;
+}
+
+/* Wrapping bar (phone grid, week view, touch): the full name over as many lines as it needs. Its
+   height never depends on --cal-lane-h — the lane is sized from it. One line = the same height as a
+   one-line bar. */
+.bar.barWrap {
+  height: auto;
+  padding-top: var(--tc-pad-y);
+  padding-bottom: var(--tc-pad-y);
+  white-space: normal;
+}
+
+.flatStart {
+  margin-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.flatEnd {
+  margin-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.overlay {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  box-shadow: var(--card-shadow-drag);
+  cursor: grabbing;
+}
+
+.overlay:hover {
+  box-shadow: var(--card-shadow-drag);
+}
+
+.overlay.bar {
+  white-space: nowrap;
+}
+
+/* ---- content ---- */
+.title {
+  display: block;
+  min-width: 0;
+}
+
+.untitled {
+  color: var(--text-tertiary);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 4px;
+  min-width: 0;
+  margin-top: 1px;
+  color: var(--text-secondary);
+  font-size: var(--tc-meta-font);
+  line-height: var(--tc-meta-line);
+  font-weight: 400;
+}
+
+.time {
+  white-space: nowrap;
+}
+
+/* Phone cells are ~33–43px wide inside: "10:30 AM" (≈46px at 10px) would run past the card. Let
+   AM/PM drop to the next line instead — the time is always fully visible. */
+.compactMetrics .time {
+  white-space: normal;
+}
+
+.repeat {
+  display: block;
+  flex-shrink: 0;
+  color: var(--icon);
+}
+
+.barLine {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.barLine .title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barWrap .barLine {
+  flex-wrap: wrap;
+  row-gap: 0;
+  overflow: visible;
+}
+
+.barWrap .barLine .title {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+/* A smaller line box for the time so it doesn't add a pixel to the title's line (baseline alignment). */
+.barWrap .barTime {
+  line-height: var(--tc-meta-line);
+}
+
+.barTime {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: var(--tc-meta-font);
+  font-weight: 400;
+}
+
+/* ---- states ---- */
+.overdue,
+.overdue:hover {
+  background: var(--overdue-card-bg);
+  color: var(--overdue-card-text);
+}
+
+.overdue .meta,
+.overdue .barTime,
+.overdue .repeat {
+  color: var(--overdue-card-text);
+}
+
+.done .title {
+  color: var(--text-tertiary);
+  text-decoration: line-through;
+  text-decoration-color: var(--text-tertiary);
+}
+
+.dragging {
+  opacity: 0.35;
+}

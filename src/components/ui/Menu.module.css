@@ -1,0 +1,112 @@
+.menu {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0;
+  outline: none;
+}
+
+.menu:focus-visible {
+  box-shadow: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  margin: 0 4px;
+  padding: 0 8px;
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.2;
+  text-align: left;
+  white-space: nowrap;
+  outline: none;
+  transition: background-color var(--dur-instant) ease-in;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.item:focus,
+.item:focus-visible,
+.subOpen {
+  background: var(--bg-hover);
+  box-shadow: none;
+}
+
+.item:active {
+  background: var(--bg-active);
+}
+
+.icon {
+  color: var(--icon);
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hint {
+  margin-left: 12px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.trail {
+  margin-left: auto;
+  margin-right: -2px;
+  color: var(--icon);
+}
+
+.hint + .trail {
+  margin-left: 4px;
+}
+
+.danger:focus,
+.danger:focus-visible {
+  color: var(--red-text);
+  background: var(--red-bg);
+}
+
+.danger:focus .icon {
+  color: var(--red-text);
+}
+
+.disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.disabled:focus {
+  background: transparent;
+}
+
+.separator {
+  height: 1px;
+  margin: 6px 0;
+  background: var(--border);
+}
+
+.sectionLabel {
+  display: flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 14px;
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+@media (pointer: coarse) {
+  .item {
+    min-height: 40px;
+    font-size: 15px;
+  }
+}

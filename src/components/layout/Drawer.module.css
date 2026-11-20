@@ -1,0 +1,55 @@
+.root {
+  position: fixed;
+  inset: 0;
+  /* Above the phone Inbox sheet (--z-sheet) — an open drawer is modal — but below peek/popovers. */
+  z-index: calc(var(--z-sheet) + 5);
+  pointer-events: none;
+}
+
+.contained {
+  position: absolute;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--backdrop);
+  pointer-events: none;
+  touch-action: none;
+}
+
+.root[data-open] .backdrop {
+  pointer-events: auto;
+}
+
+.panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(320px, 85vw);
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  padding-left: var(--safe-left);
+  background: var(--bg-sidebar);
+  box-shadow: var(--popover-shadow);
+  overflow: hidden;
+  outline: none;
+  pointer-events: auto;
+  will-change: transform;
+}
+
+.contained .panel {
+  width: min(320px, 85%);
+}
+
+.panel:focus-visible {
+  box-shadow: var(--popover-shadow);
+}
+
+.panel > * {
+  flex: 1 1 auto;
+  min-height: 0;
+}

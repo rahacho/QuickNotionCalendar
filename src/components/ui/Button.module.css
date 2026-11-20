@@ -1,0 +1,143 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  border-radius: var(--radius);
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: 500;
+  color: var(--text);
+  transition:
+    background-color var(--dur-instant) ease-in,
+    color var(--dur-instant) ease-in,
+    box-shadow var(--dur-instant) ease-in;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.button:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.sm {
+  height: 28px;
+  padding: 0 8px;
+}
+
+.md {
+  height: 32px;
+  padding: 0 12px;
+}
+
+.iconOnly.sm {
+  width: 28px;
+  padding: 0;
+}
+
+.iconOnly.md {
+  width: 32px;
+  padding: 0;
+}
+
+.label {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.icon {
+  color: var(--icon);
+}
+
+.iconRight {
+  margin-left: -2px;
+}
+
+/* ghost — Notion toolbar buttons */
+.ghost {
+  background: transparent;
+}
+
+@media (hover: hover) {
+  .ghost:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.ghost:active,
+.ghost.active {
+  background: var(--bg-active);
+}
+
+/* primary — blue fill */
+.primary {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.primary .icon {
+  color: var(--accent-text);
+}
+
+@media (hover: hover) {
+  .primary:hover {
+    background: var(--accent-hover);
+  }
+}
+
+.primary:active {
+  background: var(--accent-hover);
+  filter: brightness(0.94);
+}
+
+.primary:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+/* secondary — hairline outline */
+.secondary {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+
+@media (hover: hover) {
+  .secondary:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.secondary:active,
+.secondary.active {
+  background: var(--bg-active);
+}
+
+.secondary:focus-visible {
+  box-shadow:
+    inset 0 0 0 1px var(--border-strong),
+    var(--focus-ring);
+}
+
+/* danger — red text, red wash on hover */
+.danger {
+  background: transparent;
+  color: var(--red-text);
+}
+
+.danger .icon {
+  color: var(--red-text);
+}
+
+@media (hover: hover) {
+  .danger:hover {
+    background: var(--red-bg);
+  }
+}
+
+.danger:active {
+  background: var(--red-bg);
+}

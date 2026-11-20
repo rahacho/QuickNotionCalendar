@@ -10,3 +10,16 @@ test-results
 playwright-report
 *.log
 .DS_Store
+
+# Firebase project binding + local secrets (the repo is public)
+.firebaserc
+.env.*
+!.env.example
+functions/.env*
+!functions/.env.example
+*.local
+.secret.local
+.runtimeconfig.json
+*service-account*.json
+*serviceAccount*.json
+*-firebase-adminsdk-*.json

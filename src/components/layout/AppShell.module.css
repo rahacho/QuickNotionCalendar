@@ -1,0 +1,178 @@
+.shell {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.contained {
+  position: absolute;
+}
+
+/* ---- side panels (desktop: both; tablet: right only) ---- */
+.panel {
+  position: relative;
+  z-index: var(--z-sidebar);
+  flex: none;
+  width: 0;
+  overflow: hidden;
+  background: var(--bg-sidebar);
+  transition: width var(--dur) var(--ease);
+}
+
+.leftPanel.panelOpen {
+  width: var(--sidebar-left-w);
+}
+
+.rightPanel.panelOpen {
+  width: var(--sidebar-right-w);
+}
+
+/* Fixed-width content anchored to the panel's outer edge: as the panel narrows the content slides out. */
+.panelInner {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+  background: var(--bg-sidebar);
+  visibility: hidden;
+  transition: visibility 0s linear var(--dur);
+}
+
+.panelOpen .panelInner {
+  visibility: visible;
+  transition: visibility 0s;
+}
+
+.panelInner > :not(.collapseBtn) {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.leftInner {
+  right: 0;
+  width: var(--sidebar-left-w);
+  padding-left: var(--safe-left);
+  box-shadow: inset -1px 0 0 var(--border);
+}
+
+.rightInner {
+  left: 0;
+  width: var(--sidebar-right-w);
+  padding-right: var(--safe-right);
+  box-shadow: inset 1px 0 0 var(--border);
+}
+
+/* Notion's hover-revealed « in the sidebar's top-right corner. */
+.collapseBtn {
+  position: absolute;
+  top: calc(var(--safe-top) + 8px);
+  right: 8px;
+  z-index: 2;
+  border-radius: var(--radius);
+  background: var(--bg-sidebar);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+.panelInner:hover .collapseBtn,
+.collapseBtn:focus-within {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .collapseBtn {
+    opacity: 1;
+  }
+}
+
+/* ---- rails: slim columns that replace a collapsed sidebar (reopen button) ---- */
+.rail {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 0;
+  padding-top: calc(var(--safe-top) + 8px);
+  overflow: hidden;
+  background: var(--bg);
+  transition: width var(--dur) var(--ease);
+}
+
+.rail > * {
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+.railOpen {
+  width: var(--shell-rail-w);
+}
+
+.railOpen > * {
+  opacity: 1;
+  transition-delay: calc(var(--dur) / 2);
+}
+
+/* A collapsed Inbox still says how much is waiting in it (neutral: red means overdue). */
+.railStack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.railCount {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 18px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.leftRailEl {
+  padding-left: var(--safe-left);
+  box-sizing: content-box;
+}
+
+.leftRailEl:not(.railOpen) {
+  padding-left: 0;
+}
+
+/* ---- center (calendar) ---- */
+.center {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--safe-top);
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.center > * {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.shell[data-layout='desktop'] .center,
+.shell[data-layout='tablet'] .center {
+  padding-bottom: var(--safe-bottom);
+}
+
+.shell[data-layout='phone'] .center {
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  padding-bottom: var(--sheet-collapsed-h);
+}

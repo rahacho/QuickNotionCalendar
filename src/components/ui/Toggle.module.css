@@ -1,0 +1,40 @@
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 18px;
+  padding: 2px;
+  border-radius: 44px;
+  background: var(--toggle-off);
+  transition: background-color var(--dur) var(--ease);
+}
+
+.toggle::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
+.toggle:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.on {
+  background: var(--accent);
+}
+
+.knob {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent-text);
+  transform: translateX(0);
+  transition: transform var(--dur) var(--ease);
+}
+
+.on .knob {
+  transform: translateX(12px);
+}

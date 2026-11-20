@@ -86,8 +86,11 @@ users/{uid}/tasks/{taskId}      Task (id duplicated inside doc)
 users/{uid}/devices/{deviceId}  DeviceDoc (Web Push subscription)
 ```
 
-Rules: owner-only read/write on `users/{uid}` and everything beneath (plus light shape validation on tasks: `title is string && title.size() <= 500`).
-Indexes: collection-group `tasks.remindAt` ASC; **exempt `overrides` from indexing** (map can grow large).
+Rules: owner-only read/write on `users/{uid}` and everything beneath, for ALLOWLISTED accounts only (`allow/{uid}`, created by
+the owner in the console; docs/DEPLOY.md) (plus light shape validation on tasks: `title is string && title.size() <= 500`,
+numeric `remindAt`, timestamp `syncedAt`). `users/{uid}/fired/*` is the function's own (no client access).
+Indexes: `tasks.remindAt` ASC (collection scope: the function queries each user's tasks); **exempt `overrides` from indexing**
+(map can grow large); TTL on `fired.expireAt`.
 
 Sync semantics:
 - **Optimistic & offline-first.** UI never awaits a write. Firestore `persistentLocalCache` + `persistentMultipleTabManager`;
@@ -97,6 +100,11 @@ Sync semantics:
   per-occurrence override changes use `FieldPath('overrides', date, field)` so two devices editing different
   occurrences/fields never clobber each other. Full-doc `setDoc` only for create and undo-restore.
 - Every write sets `updatedAt = Date.now()` and recomputes `remindAt` (shared/reminders.ts) with `settings.timezone`.
+- `remindAt` is DERIVED but written as its own field, so a field-level merge of two devices' edits (or a write computed
+  from a stale offline copy, or by a device whose clock is off) can leave it wrong. Every task write therefore also stamps
+  `syncedAt = serverTimestamp()` (Firestore only; not part of `Task`), and the scheduled function re-derives remindAt from
+  the MERGED document of every task written in the last 20 minutes (§7). Server-confirmed snapshots on an open client are
+  repaired the same way right away (boot.ts).
 - Local mode: when `VITE_FIREBASE_API_KEY` is unset (dev/E2E), the app skips auth and uses `LocalRepo`
   (IndexedDB via idb-keyval + BroadcastChannel for cross-tab), uid `"local"`. Same Repo interface.
 
@@ -217,8 +225,10 @@ export interface SnapshotMeta { fromCache: boolean; hasPendingWrites: boolean }
 export interface Repo {
   readonly kind: 'firebase' | 'local'
   subscribeTasks(onChange: (tasks: Record<string, Task>, meta: SnapshotMeta) => void, onError: (e: Error) => void): () => void
-  subscribeUser(onChange: (doc: UserDoc | null) => void, onError: (e: Error) => void): () => void
-  apply(ops: RepoOp[]): void                 // atomic (Firestore writeBatch); fire-and-forget; errors → store.sync.error + toast
+  subscribeUser(onChange: (doc: UserDoc | null, meta?: SnapshotMeta) => void, onError: (e: Error) => void): () => void   // meta: from the offline cache?
+  apply(ops: RepoOp[]): void                 // fire-and-forget; applied to the in-memory view at once, in order; persisted PER DOCUMENT
+                                             // (Firestore: the ops of one task in one microtask are one commit; different tasks commit
+                                             // independently — no all-or-nothing batch across tasks); errors → store.sync.error + toast
   updateUser(patch: { settings?: Partial<Settings>; summaryAt?: number | null }): void   // merge; settings merged deeply (summary sub-object too)
   saveDevice(deviceId: string, doc: DeviceDoc): Promise<void>
   deleteDevice(deviceId: string): Promise<void>
@@ -293,9 +303,12 @@ export function setSeriesStart(taskId: string, date: ISODate): void      // recu
 export function setDone(ref: OccurrenceRef, done: boolean): void         // done=true → toast "Task completed" + Undo; recomputes remindAt
 export function deleteOccurrence(ref: OccurrenceRef): void               // recurring → overrides[orig].skipped=true; else delete task. Toast "Task deleted" + Undo.
 export function deleteTask(taskId: string): void                         // whole series. Toast + Undo (restores full doc).
-export function setRecurrence(taskId: string, rule: Recurrence | null): void  // setting a rule clears endDate; requires date (else no-op)
+export function setRecurrence(taskId: string, rule: Recurrence | null, opts?: { keepOrigDate?: ISODate | null; start?: ISODate }): void
+//   setting a rule clears endDate; requires date (else no-op); an OVERDUE one-time task keeps its missed instance (a one-time copy
+//   stays in Overdue, the series skips that date). null → one-time task on the viewed / next open occurrence (Undo toast); a series
+//   just made from an overdue task, untouched since, folds back into that one overdue task.
 export function setReminder(taskId: string, reminder: Reminder): void
-export function moveAllOverdueToToday(): void                            // one batch, one undo entry, toast "Moved N tasks to today" + Undo
+export function moveAllOverdueToToday(): void                            // one repo.apply, one undo entry, toast "Moved N tasks to today" + Undo
 export function duplicateTask(taskId: string): string
 export function updateSettings(patch: Partial<Settings>): void           // recomputes summaryAt; if timezone changed, recomputes every task's remindAt (batched)
 export function setTheme(theme: ThemePref): void
@@ -329,7 +342,9 @@ export function startClock(): () => void   // sets store.today now, at next loca
 ```
 
 Undo: each undoable action records the affected task docs *before* the change (full snapshots) and the ids created;
-undo restores them with `repo.apply([...set/delete])` in one batch. Toast "Undo" button calls the same entry.
+undo restores them with `repo.apply([...set/delete])` in one batch. Toast "Undo" button calls the same entry. A toast's Undo
+clicked after later steps touched the same task takes back only that step's change (later changes stay) and rebases the later
+entries, so no later ⌘Z can bring it back; a new change clears the redo stack and dismisses its "Undid: … · Redo" toasts.
 
 ### 4.4 src/dnd/ (owned by calendar agent; used by tasks + inbox)
 
@@ -388,7 +403,9 @@ export const platform: { isIOS: boolean; isTouch: boolean; isMac: boolean }
 
 `src/App.tsx` (shell agent) composes: `<DndProvider><AppShell left={<TasksSidebar/>} center={<CalendarView/>} right={<InboxPanel/>}
 phoneSheet={<InboxSheet/>} overlays={<><TaskPeek/><SettingsModal/><QuickAddSheet/><Toaster/></>} /></DndProvider>`, gated by
-`<AuthScreen/>` when `mode==='firebase' && authReady && !user`, and a Notion-style blank loading state until `tasksLoaded`.
+`<AuthScreen/>` when `mode==='firebase' && authReady && !user`, and a Notion-style blank loading state until `tasksLoaded` —
+or, when the tasks listener failed before any data arrived (`sync.loadFailed`), "Couldn't load your tasks" with the reason,
+Try again and Sign out (never an empty calendar that reads as "Nothing planned").
 Each imported component's file path/name is fixed by this spec; the shell agent creates **placeholder stubs** for components it
 doesn't own (feature agents overwrite them).
 
@@ -489,11 +506,17 @@ completion: opacity→0 + scale .96 (160ms). Nothing bounces except the checkbox
 - Push enablement (Settings → Notifications → "Enable on this device", must be a user gesture; iOS requires installed app):
   `Notification.requestPermission()` → `pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: VAPID_PUBLIC })` →
   `repo.saveDevice(deviceId)`; deviceId in localStorage. Badge sync: `navigator.setAppBadge(useBadgeCount())` when permitted.
-- Cloud Function `tick` (`onSchedule('every 1 minutes')`, region us-central1): (1) collectionGroup `tasks` where `remindAt <= now`
-  (limit 200) → for each: skip if stale (> 15 min late, but still advance), send push to all user devices, set `remindAt` =
-  `computeRemindAt(task, tz, now)`; (2) `users` where `summaryAt <= now` → `summaryText` + `badgeCount` push → set
-  `summaryAt = nextSummaryAt(settings, now)`. Prune device docs on 404/410. VAPID private key via `defineSecret('VAPID_PRIVATE_KEY')`;
-  VAPID subject = the hosting URL (never a personal email). Built with esbuild (bundles ../shared).
+- Cloud Function `tick` (`onSchedule('every 1 minutes')`, region us-central1), for each ALLOWLISTED user (`allow/{uid}`), with
+  per-user queries (another account can never take the owner's slots): (1) tasks written in the last 20 min (`syncedAt`) →
+  remindAt re-derived from the merged doc, a missing / too-late value lowered to the first alert after the write landed;
+  (2) tasks where `remindAt <= now` (limit 200) → for each: skip if stale (> 15 min late, but still advance), send push to all
+  user devices (every non-stale alert since the stored one, each once: sent (occurrence, instant) pairs are kept in
+  `users/{uid}/fired/{taskId}`), set `remindAt` = `computeRemindAt(task, tz, now)`; (3) `summaryAt <= now` → `summaryText` +
+  `badgeCount` push → set `summaryAt = nextSummaryAt(settings, now)` (an instant already summarized — `summarySentAt` — is not
+  sent again; a summaryAt that disagrees with the settings is repaired); (4) once a day, and right after a time-zone change,
+  the same remindAt repair over every open task. Every send is preceded by a conditional write (claim). Prune device docs on
+  404/410. VAPID private key via `defineSecret('VAPID_PRIVATE_KEY')`; VAPID subject = the hosting URL (never a personal email).
+  Built with esbuild (bundles ../shared).
 
 ---
 

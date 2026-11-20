@@ -1,0 +1,69 @@
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--radius);
+  color: var(--icon);
+  background: transparent;
+  transition: background-color var(--dur-instant) ease-in;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.s28 {
+  width: 28px;
+  height: 28px;
+}
+
+.s24 {
+  width: 24px;
+  height: 24px;
+}
+
+@media (hover: hover) {
+  .button:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.button:active,
+.active {
+  background: var(--bg-active);
+}
+
+.button:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.icon {
+  color: inherit;
+}
+
+.dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--today);
+  box-shadow: 0 0 0 1.5px var(--bg);
+}
+
+/* Touch: an invisible extension gives every icon button a ≥44px hit area without changing layout.
+   Single-class selectors on purpose: places that tune their own (calendar header, mini calendar,
+   peek top bar — where neighbours sit closer than the extension) override them with two classes. */
+@media (pointer: coarse) {
+  .button::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+  }
+
+  .s24::after {
+    inset: -10px;
+  }
+}

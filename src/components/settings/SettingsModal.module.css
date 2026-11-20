@@ -1,0 +1,230 @@
+.root {
+  --settings-bg: var(--bg);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.phone {
+  --settings-bg: var(--bg-elevated);
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: 52px;
+  margin: 1px 1px 0;
+  padding: 0 11px 0 23px;
+  border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0;
+  background: var(--settings-bg);
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.content {
+  padding: 0 24px 28px;
+}
+
+.section {
+  margin-top: 18px;
+}
+
+.section:first-child {
+  margin-top: 10px;
+}
+
+.sectionTitle {
+  padding-bottom: 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 52px;
+  padding: 8px 0;
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rowTitle {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.rowDesc {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.rowDesc strong {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.inlineIcon {
+  display: inline-block;
+  vertical-align: -2px;
+  color: var(--accent);
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.muted .rowTitle {
+  color: var(--text-tertiary);
+}
+
+/* Notion dropdown: borderless text + chevron, hover wash. */
+.selectWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.select {
+  height: 28px;
+  padding: 0 24px 0 8px;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  transition: background-color var(--dur-instant) ease-in;
+  text-align: right;
+  text-align-last: right;
+}
+
+@media (hover: hover) {
+  .select:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.select:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.select option {
+  background: var(--bg-elevated);
+  color: var(--text);
+  text-align: left;
+}
+
+.selectChevron {
+  position: absolute;
+  right: 7px;
+  pointer-events: none;
+}
+
+.timeField {
+  width: 104px;
+}
+
+.shortcuts {
+  margin: 4px 0 0;
+}
+
+.shortcut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.shortcut dt {
+  color: var(--text);
+}
+
+.keys {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+}
+
+/* ---- Phone (full-height sheet) ---- */
+.phone .header {
+  height: 48px;
+  padding: 0 12px 0 20px;
+}
+
+.phone .title {
+  font-size: 17px;
+}
+
+.phone .content {
+  padding: 0 20px 24px;
+}
+
+.phone .row {
+  min-height: 56px;
+}
+
+.phone .rowTitle {
+  font-size: 15px;
+}
+
+.phone .rowDesc {
+  font-size: 13px;
+  line-height: 18px;
+}
+
+@media (pointer: coarse) {
+  .select {
+    height: 36px;
+    font-size: 16px;
+  }
+}
+
+/* A row whose controls may drop below its text (sign-out confirmation: long copy + two buttons). */
+.wrap {
+  flex-wrap: wrap;
+  row-gap: 10px;
+}
+
+.wrap .rowText {
+  flex: 1 1 240px;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wrap .control {
+  margin-left: auto;
+}

@@ -1,0 +1,123 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+  height: 44px;
+  /* Inset by 1px so the sticky bar never paints over the panel's hairline ring (dark theme). */
+  margin: 1px 1px 0;
+  padding: 0 9px;
+  border-radius: calc(var(--radius-lg) - 1px) calc(var(--radius-lg) - 1px) 0 0;
+  background: var(--bg);
+}
+
+.content {
+  padding: 8px 48px 32px;
+}
+
+.props {
+  display: flex;
+  flex-direction: column;
+  margin: 12px 0 0 -4px;
+}
+
+.divider {
+  height: 1px;
+  margin: 14px 0 10px;
+  background: var(--border);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  margin-left: -4px;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 8px 0 6px;
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 20px;
+  transition:
+    background-color var(--dur-instant) ease-in,
+    color var(--dur-instant) ease-in;
+}
+
+.actionIcon {
+  color: inherit;
+  opacity: 0.85;
+}
+
+@media (hover: hover) {
+  .action:hover {
+    background: var(--bg-hover);
+    color: var(--text);
+  }
+
+  .danger:hover {
+    background: var(--red-bg);
+    color: var(--red-text);
+  }
+}
+
+.action:active,
+.actionActive {
+  background: var(--bg-active);
+  color: var(--text);
+}
+
+.danger:active,
+.danger.actionActive {
+  background: var(--red-bg);
+  color: var(--red-text);
+}
+
+/* Touch: ⋯ and ✕ get 40px boxes, extended only vertically (40×44), so neither covers the other. */
+@media (pointer: coarse) {
+  .topbar {
+    gap: 4px;
+  }
+
+  .topbar .topButton {
+    width: 40px;
+    height: 40px;
+  }
+
+  .topbar .topButton::after {
+    inset: -2px 0;
+  }
+}
+
+/* ---- Phone: same content in a bottom sheet ---- */
+.sheet .topbar {
+  height: 40px;
+  padding: 0 12px;
+  background: var(--bg-elevated);
+}
+
+.sheet .content {
+  padding: 0 20px 20px;
+}
+
+.sheet .action {
+  height: 40px;
+  font-size: 15px;
+}
+

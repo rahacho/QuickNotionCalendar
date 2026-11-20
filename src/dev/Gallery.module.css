@@ -1,0 +1,530 @@
+/* ===== Gallery page ===== */
+.page {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  padding-bottom: 120px;
+  background: var(--bg);
+}
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 44px;
+  padding: 0 16px;
+  background: var(--bg);
+  box-shadow: inset 0 -1px 0 var(--border);
+}
+
+.navLink {
+  padding: 4px 8px;
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.navLink:hover {
+  background: var(--bg-hover);
+}
+
+.navActive {
+  color: var(--text);
+  background: var(--bg-active);
+}
+
+.themeSwitch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.section {
+  padding: 24px 32px;
+}
+
+.h2 {
+  margin-bottom: 16px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.row2 {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 0;
+  box-shadow: inset 0 -1px 0 var(--border);
+}
+
+.rowLabel {
+  flex: none;
+  width: 140px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.rowBody {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* cards */
+.cardGrid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.cardCell {
+  width: 184px;
+  padding: 8px 0 4px;
+  background: var(--bg);
+  box-shadow: inset 0 0 0 1px var(--grid-line);
+}
+
+.cardCellNarrow {
+  width: 56px;
+}
+
+.cellLabel {
+  padding: 0 6px 6px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.barTrack {
+  position: relative;
+  max-width: 760px;
+  height: 152px;
+  box-shadow: inset 0 0 0 1px var(--grid-line);
+}
+
+/* peek mock */
+.peekTop {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  height: 44px;
+  padding: 0 12px;
+}
+
+.peekBody {
+  padding: 8px 48px 32px;
+}
+
+.peekTitle {
+  margin-bottom: 16px;
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.prop {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+}
+
+.propLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 160px;
+  color: var(--text-secondary);
+}
+
+.propValue {
+  flex: 1;
+  padding: 4px 6px;
+  border-radius: var(--radius);
+  text-align: left;
+  line-height: 20px;
+}
+
+.propValue:hover {
+  background: var(--bg-hover);
+}
+
+.empty {
+  color: var(--text-placeholder);
+}
+
+.divider {
+  height: 1px;
+  margin: 16px 0 8px;
+  background: var(--border);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* sheet mock */
+.sheetContent {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 20px 16px;
+}
+
+.sheetTitle {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.sheetHint {
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+/* ===== Shell preview ===== */
+.shellFrame {
+  position: absolute;
+  inset: 0;
+}
+
+/* --- mock calendar (Notion full-page calendar) --- */
+.cal {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg);
+}
+
+.calHeader {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+  padding: 0 8px 0 12px;
+}
+
+.calTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.calTitle {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.calActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.weekdays {
+  display: grid;
+  flex: none;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: center;
+  height: 24px;
+  margin: 0 5px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-align: center;
+}
+
+.grid {
+  flex: 1;
+  min-height: 0;
+  margin: 0 5px;
+  overflow: auto;
+  border-top: 1px solid var(--grid-line);
+  border-left: 1px solid var(--grid-line);
+}
+
+.week {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  min-height: var(--cal-row-min-h);
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-bottom: 6px;
+  border-right: 1px solid var(--grid-line);
+  border-bottom: 1px solid var(--grid-line);
+  background: var(--bg);
+}
+
+.weekend {
+  background: var(--bg-weekend);
+}
+
+.dayHead {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: flex-start;
+  justify-content: flex-end;
+  height: var(--cal-date-row-h);
+  padding: 6px 8px 0;
+}
+
+.dayNum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 20px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 20px;
+  transition: color 150ms var(--ease);
+}
+
+.dim {
+  color: var(--text-secondary);
+}
+
+.today {
+  width: 24px;
+  height: 24px;
+  margin: -2px -5px 0 0;
+  border-radius: 50%;
+  background: var(--today);
+  color: var(--today-text);
+  font-weight: 500;
+}
+
+.dayAdd {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  box-shadow: var(--card-shadow);
+}
+
+.dayCards {
+  padding-top: calc(var(--lanes, 0) * var(--cal-lane-h));
+}
+
+.barPos {
+  position: absolute;
+  top: var(--cal-date-row-h);
+}
+
+.calCompact {
+  --cal-row-min-h: 84px;
+  --cal-date-row-h: 24px;
+  --cal-card-font: 11px;
+  --cal-card-line: 13px;
+  --cal-card-pad-y: 2px;
+  --cal-card-pad-x: 4px;
+  --cal-card-gap: 2px;
+  --cal-cell-pad-x: 2px;
+  --cal-lane-h: 19px;
+}
+
+.calCompact .weekdays,
+.calCompact .grid {
+  margin: 0;
+}
+
+.calCompact .grid {
+  border-left: 0;
+}
+
+.calCompact .dayHead {
+  justify-content: center;
+  padding: 3px 0 0;
+}
+
+.calCompact .dayNum {
+  font-size: 12px;
+  height: 18px;
+}
+
+.calCompact .today {
+  width: 20px;
+  height: 20px;
+  margin: -1px 0 0;
+}
+
+/* --- mock sidebars --- */
+.sidebar,
+.inbox {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sideHeader {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-h);
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sideScroll {
+  flex: 1;
+  min-height: 0;
+  padding: 0 8px;
+  overflow: auto;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.groupTitle {
+  white-space: nowrap;
+}
+
+.groupSub {
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.groupCount {
+  margin-left: auto;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.moveAll {
+  margin-left: auto;
+  padding: 2px 6px;
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.moveAll:hover {
+  background: var(--bg-hover);
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 30px;
+  padding: 5px 8px;
+  border-radius: var(--radius);
+}
+
+.row:hover {
+  background: var(--bg-hover);
+}
+
+.row > button {
+  margin-top: 2px;
+}
+
+.rowTitle {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+}
+
+.rowDone {
+  color: var(--text-tertiary);
+  text-decoration: line-through;
+}
+
+.rowMeta {
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.red {
+  color: var(--red-text);
+}
+
+.sideFooter {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 10px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  box-shadow: inset 0 1px 0 var(--border);
+}
+
+.inboxBody {
+  flex: 1;
+  min-height: 0;
+  padding: 0 12px;
+  overflow: auto;
+}
+
+.bubbles {
+  margin-top: 10px;
+}
+
+.inboxSheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-sheet);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: var(--sheet-collapsed-h);
+  padding-bottom: var(--safe-bottom);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: var(--bg-elevated);
+  box-shadow: var(--popover-shadow);
+}
+
+.sheetHandle {
+  width: 36px;
+  height: 5px;
+  margin-top: 7px;
+  border-radius: 3px;
+  background: var(--text-placeholder);
+}
+
+.inboxSheetRow {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px 16px 0;
+  font-size: 15px;
+  font-weight: 600;
+}

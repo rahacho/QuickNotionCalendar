@@ -81,8 +81,10 @@ export interface Task {
   reminder: Reminder;
   /**
    * Next reminder instant (computed by shared/reminders.ts nextReminder, written by the client on every
-   * task write and by Cloud Functions after firing). null => nothing scheduled. Indexed for the
-   * scheduled function's collection-group query.
+   * task write and by Cloud Functions after firing — and re-derived by them from the merged document
+   * of recently written tasks, since a field-level merge can leave it wrong). null => nothing
+   * scheduled. Indexed for the scheduled function's per-user query. (Firestore docs also carry a
+   * server-only `syncedAt` commit timestamp; it is not part of Task.)
    */
   remindAt: Millis | null;
   createdAt: Millis;

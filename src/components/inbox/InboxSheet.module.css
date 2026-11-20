@@ -1,0 +1,240 @@
+/* Phone Inbox bottom sheet (always mounted; positioned by transform). */
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: var(--z-sheet);
+  display: flex;
+  flex-direction: column;
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: var(--bg-elevated);
+  color: var(--text);
+  box-shadow:
+    0 -1px 0 var(--border),
+    0 -6px 24px color-mix(in srgb, var(--backdrop) 28%, transparent);
+  will-change: transform;
+}
+
+/* Fills the gap under the sheet while it is rubber-banded above its top detent. */
+.sheet::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 160px;
+  background: var(--bg-elevated);
+  pointer-events: none;
+}
+
+/* ---- header: handle + "Inbox · N" + add (the drag / tap target) ---- */
+.header {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  height: 56px;
+  outline: none;
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.header:active {
+  cursor: grabbing;
+}
+
+/* "Inbox · N": the keyboard / screen-reader control (fills the title row up to "+"). */
+.handleButton {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  align-self: stretch;
+  border-radius: var(--radius);
+  outline: none;
+}
+
+.handleButton:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.handleBar {
+  display: flex;
+  justify-content: center;
+  flex: none;
+  height: 18px;
+  padding-top: 7px;
+}
+
+.handle {
+  width: 36px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--text-placeholder);
+}
+
+.titleRow {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 0 10px 0 16px;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.count {
+  display: inline-flex;
+  gap: 6px;
+  color: var(--text-tertiary);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sep {
+  color: var(--text-tertiary);
+}
+
+.add {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+/* ---- content ---- */
+.content {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  transition: visibility 0s;
+}
+
+/* Collapsed = handle + "Inbox · N" only (SPEC §6). On Face ID iPhones the bar is taller than its header
+   (home-indicator inset) and would otherwise show an inert input field. Hidden once the slide down has
+   finished; shown at once when the sheet opens. */
+.sheet[data-snap='collapsed'] .content {
+  visibility: hidden;
+  transition: visibility 0s linear var(--dur-slow);
+}
+
+.inputRow {
+  flex: none;
+  padding: 2px 12px 10px;
+}
+
+.list {
+  --inbox-pad-x: 12px;
+}
+
+/* ---- iOS focus proxy (never visible, never panned to) ---- */
+.proxy {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  font-size: 16px;
+  pointer-events: none;
+  caret-color: transparent;
+}
+
+/* ---- drag-time "Move to Inbox" drop zone ---- */
+.dropHost {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: calc(var(--z-sheet) + 1);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  /* Exactly the strip the collapsed sheet vacates (the calendar ends above it), so the whole bottom
+     edge is a generous drop target without covering any day cell. */
+  height: var(--sheet-collapsed-h);
+  padding: 12px 16px 0;
+  pointer-events: none;
+  visibility: hidden;
+  /* Stay visible until the pill has slid away. */
+  transition: visibility 0s linear var(--dur-slow);
+}
+
+.dropHit {
+  position: absolute;
+  top: 20px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+/* While a drag is in flight the dnd layer hit-tests the element under the pointer: the pill and the
+   strip below the dead band take it; the host's top band doesn't (the calendar keeps edge-scrolling). */
+.dropHostActive {
+  visibility: visible;
+  transition: visibility 0s;
+}
+
+.dropHostActive .dropHit,
+.dropHostActive .pill {
+  pointer-events: auto;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  max-width: 100%;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 20px;
+  background: var(--bg-elevated);
+  box-shadow: var(--popover-shadow);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
+}
+
+.pill > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pillIcon {
+  color: inherit;
+}
+
+.pillOver {
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg-elevated));
+  box-shadow:
+    inset 0 0 0 1.5px var(--accent),
+    var(--popover-shadow);
+  color: var(--accent);
+}
+
+.pillDisabled {
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+}

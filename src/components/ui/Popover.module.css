@@ -1,0 +1,25 @@
+.positioner {
+  z-index: var(--z-popover);
+  outline: none;
+}
+
+.positioner:focus-visible {
+  box-shadow: none;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  max-width: calc(100vw - 16px);
+  max-height: var(--popover-max-h, 70vh);
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+  box-shadow: var(--popover-shadow);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  will-change: transform, opacity;
+}

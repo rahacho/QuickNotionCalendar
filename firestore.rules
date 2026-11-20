@@ -1,0 +1,81 @@
+rules_version = '2';
+
+// Tasks — every document lives under users/{uid} and only that signed-in user can read or write it,
+// and only if the account is ALLOWLISTED: a document allow/{uid} that the project owner creates in the
+// Firebase console (docs/DEPLOY.md). Anyone else who signs up gets nothing, and the scheduled function
+// only serves allowlisted accounts too. Cloud Functions use the Admin SDK (rules don't apply to it).
+// Light shape validation keeps the fields the scheduled function queries (remindAt / summaryAt /
+// syncedAt — the server commit time every task write stamps) well-typed and titles bounded.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function allowlisted() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/allow/$(request.auth.uid));
+    }
+
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid && allowlisted();
+    }
+
+    function isMillisOrNull(data, field) {
+      return !(field in data) || data[field] == null || data[field] is number;
+    }
+
+    function validUser(data) {
+      return (!('settings' in data) || data.settings is map)
+        && isMillisOrNull(data, 'summaryAt')
+        && isMillisOrNull(data, 'updatedAt');
+    }
+
+    function validTask(data, taskId) {
+      return data.title is string
+        && data.title.size() <= 500
+        && (!('id' in data) || data.id == taskId)
+        && isMillisOrNull(data, 'remindAt')
+        && isMillisOrNull(data, 'updatedAt')
+        && (!('syncedAt' in data) || data.syncedAt is timestamp)
+        && (!('overrides' in data) || data.overrides is map);
+    }
+
+    function validDevice(data) {
+      return data.subscription is map
+        && data.subscription.endpoint is string
+        && data.subscription.endpoint.size() <= 2048
+        && data.subscription.endpoint.matches('https://.+')
+        && data.subscription.keys is map
+        && data.subscription.keys.p256dh is string
+        && data.subscription.keys.auth is string;
+    }
+
+    // allow/{uid} — the allowlist. Written only in the console; an account may check its own entry.
+    match /allow/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // users/{uid} — UserDoc { settings, summaryAt, updatedAt }
+    match /users/{uid} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid) && validUser(request.resource.data);
+    }
+
+    // users/{uid}/tasks/{taskId} — Task
+    match /users/{uid}/tasks/{taskId} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid) && validTask(request.resource.data, taskId);
+    }
+
+    // users/{uid}/devices/{deviceId} — DeviceDoc (one Web Push subscription per device)
+    match /users/{uid}/devices/{deviceId} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid) && validDevice(request.resource.data);
+    }
+
+    // users/{uid}/fired/{taskId} — the function's record of alerts already sent (admin only).
+    // Anything else the owner keeps under their user document (validated collections excluded above).
+    match /users/{uid}/{coll}/{rest=**} {
+      allow read, write: if isOwner(uid) && !(coll in ['tasks', 'devices', 'fired']);
+    }
+  }
+}

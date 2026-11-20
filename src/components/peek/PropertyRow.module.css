@@ -1,0 +1,101 @@
+.row {
+  --prop-label-w: 160px;
+  display: flex;
+  align-items: flex-start;
+  min-height: 34px;
+  width: 100%;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 var(--prop-label-w);
+  width: var(--prop-label-w);
+  height: 34px;
+  padding: 0 6px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 20px;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.icon {
+  color: var(--icon);
+}
+
+.labelText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 34px;
+  padding: 7px 8px;
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 20px;
+  text-align: left;
+  overflow-wrap: anywhere;
+  transition: background-color var(--dur-instant) ease-in;
+}
+
+.interactive {
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .interactive:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.interactive:active,
+.active {
+  background: var(--bg-active);
+}
+
+.interactive:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.empty {
+  color: var(--text-placeholder);
+}
+
+.danger {
+  color: var(--red-text);
+}
+
+.disabled,
+.disabled:hover,
+.disabled:active {
+  background: transparent;
+  cursor: default;
+}
+
+@media (pointer: coarse) {
+  .row {
+    --prop-label-w: 124px;
+    min-height: 40px;
+  }
+
+  .label {
+    height: 40px;
+    font-size: 15px;
+  }
+
+  .value {
+    min-height: 40px;
+    padding: 10px 8px;
+    font-size: 15px;
+  }
+}

@@ -1,0 +1,112 @@
+/* Shared Inbox content (desktop panel + phone sheet): input, bubbles, empty state. */
+
+.inputText {
+  /* Same metrics as the bubbles below it. */
+  font-size: 14px;
+}
+
+@media (pointer: coarse) {
+  .inputText {
+    font-size: 16px;
+  }
+}
+
+/* ---- scrolling bubble list ---- */
+.list {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  /* Hosts set --inbox-pad-x / --inbox-pad-bottom (panel vs. sheet). */
+  padding: 0 var(--inbox-pad-x, 12px) var(--inbox-pad-bottom, 16px);
+}
+
+.bubbles {
+  display: flex;
+  flex-direction: column;
+  /* Room for the first card's ring/shadow (light theme draws it outside the box). */
+  padding-top: 2px;
+}
+
+.bubbleWrap {
+  position: relative;
+  flex: none;
+}
+
+/* The gap lives on the slot, not as a card margin, so collapsing rows animate to exactly 0. */
+.slot {
+  position: relative;
+  padding-bottom: 6px;
+}
+
+.slot > .bubble {
+  margin: 0;
+}
+
+.bubble {
+  touch-action: manipulation;
+}
+
+/* ---- hover ⋯ (fine pointers only) ---- */
+.more {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: var(--bg-card);
+  box-shadow: var(--card-shadow);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--dur-fast) var(--ease),
+    background-color var(--dur-instant) ease-in;
+}
+
+@media (hover: hover) {
+  .slot:hover .more {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .more:hover {
+    background: var(--bg-card-hover);
+  }
+}
+
+.more:focus-visible,
+.slotMenuOpen .more {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* No hover affordances while a task is being dragged over the list (beats `.slot:hover .more`). */
+.listDragging .more,
+.listDragging .slot:hover .more {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---- empty state ---- */
+.empty {
+  position: absolute;
+  top: 0;
+  left: var(--inbox-pad-x, 12px);
+  right: var(--inbox-pad-x, 12px);
+  padding: 10px 2px 0;
+  pointer-events: none;
+}
+
+.emptyTitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.emptyText {
+  margin-top: 2px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 16px;
+}

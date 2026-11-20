@@ -1,0 +1,702 @@
+/*
+ * Notion full-page calendar. Metrics are pixel-matched to the owner's reference (dark, 1320px wide):
+ * header 44px, weekday row 24px + 1px line, 5px gutters, 1px grid lines, 124px rows, date label
+ * 14px top-right (padding 5px 10px 0), 24px today circle.
+ */
+
+/* ------------------------------------------------------------------ frame */
+.root {
+  --cal-head-h: var(--cal-date-row-h);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.pane {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ------------------------------------------------------------------ header */
+.header {
+  position: relative;
+  z-index: var(--z-header);
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: var(--header-h);
+  padding: 0 8px 0 12px;
+  background: var(--bg);
+}
+
+.headerPhone {
+  padding: 0 6px 0 6px;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.title {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+
+.titleButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  height: 32px;
+  padding: 0 6px;
+  border-radius: var(--radius);
+  color: var(--text);
+  transition: background-color var(--dur-instant) ease-in;
+}
+
+.titleButton .title {
+  font-size: 16px;
+}
+
+.titleButton:active,
+.titleButtonActive {
+  background: var(--bg-active);
+}
+
+.titleChevron {
+  flex: none;
+  color: var(--icon);
+}
+
+.actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+}
+
+.viewButton {
+  margin-right: 4px;
+}
+
+.todayButton {
+  padding: 0 6px;
+}
+
+/* ‹ › while a dragged card hovers them (600ms dwell flips the month/week). */
+.navButton[data-dnd-hover] {
+  background: var(--bg-active);
+}
+
+/* Touch: the SPEC's header metrics are desktop ones (24–28px). On a finger, every header control gets
+   a ≥40×44 hit area — slightly larger boxes plus an invisible extension that fills the 44px header
+   and the outer padding, never overlapping a neighbour's (‹ Today › sit 4px apart, 2px each side). */
+@media (pointer: coarse) {
+  .header .actions {
+    gap: 4px;
+  }
+
+  .header .navButton,
+  .header .menuButton {
+    width: 32px;
+    height: 32px;
+  }
+
+  .header .todayButton {
+    position: relative;
+    height: 32px;
+    padding: 0 8px;
+  }
+
+  .header .navButton::after,
+  .header .menuButton::after,
+  .header .todayButton::after,
+  .header .titleButton::after {
+    content: '';
+    position: absolute;
+    inset: -6px -2px;
+  }
+
+  /* Wide already: only taller (it must not eat into ☰'s 2px). */
+  .header .titleButton::after {
+    inset: -6px 0;
+  }
+
+  .header .titleButton {
+    position: relative;
+  }
+
+  /* The outer controls also reach into the free space beside them. */
+  .header .menuButton::after {
+    left: -6px;
+  }
+
+  .header [data-testid='cal-prev']::after {
+    left: -8px;
+  }
+
+  .header [data-testid='cal-next']::after {
+    right: -6px;
+  }
+}
+
+/* ------------------------------------------------------------------ month scroller */
+.scroller {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0 5px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* Our own anchoring compensates prepends (Safari has none): the native one must not double it. */
+  overflow-anchor: none;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  outline: none;
+}
+
+.weekdays {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: center;
+  height: 25px;
+  /* Labels sit 11px above the grid line, as in the reference. */
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--grid-line);
+  background: var(--bg);
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.grid {
+  border-left: 1px solid var(--grid-line);
+}
+
+/* ------------------------------------------------------------------ week row + cells */
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  min-height: var(--cal-row-min-h);
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-bottom: 6px;
+  border-right: 1px solid var(--grid-line);
+  border-bottom: 1px solid var(--grid-line);
+  background: var(--bg);
+  transition: background-color var(--dur-fast) var(--ease);
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Keyboard focus on a day (roving tab stop): an inset ring, never shown for clicks. Arrow-key focus
+   scrolls a cell clear of the sticky weekday header. */
+.cell:focus {
+  outline: none;
+}
+
+.cell:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 57%, transparent);
+  outline-offset: -2px;
+}
+
+.scroller .cell {
+  scroll-margin-top: 32px;
+}
+
+.weekend {
+  background: var(--bg-weekend);
+}
+
+.cell.over {
+  background: var(--bg-drop-target);
+}
+
+.weekend.over {
+  background: linear-gradient(var(--bg-drop-target), var(--bg-drop-target)), var(--bg-weekend);
+}
+
+.head {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: flex-start;
+  justify-content: flex-end;
+  height: var(--cal-date-row-h);
+  /* Pixel-matched to the reference: digits end 11px left of the cell's right line, glyph top 10px
+     below the row line; the today circle sits 4px in from both lines. */
+  padding: 5px 10px 0;
+}
+
+.num {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  white-space: pre;
+  transition: color 150ms var(--ease);
+}
+
+.dim {
+  color: var(--text-secondary);
+}
+
+.today {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  margin: 2px -6px 0 0;
+  padding: 0 4px;
+  border-radius: 12px;
+  background: var(--today);
+  color: var(--today-text);
+  font-weight: 500;
+}
+
+.add {
+  /* Pixel-matched to the reference: 26px box (incl. the 1px ring) 5px from the cell's top-left. */
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  box-shadow: var(--card-shadow);
+  color: color-mix(in srgb, var(--text) 65%, transparent);
+  opacity: 0;
+  transition:
+    opacity var(--dur-fast) var(--ease),
+    background-color var(--dur-instant) ease-in;
+}
+
+.add:focus-visible {
+  opacity: 1;
+  box-shadow:
+    var(--card-shadow),
+    var(--focus-ring);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cell:hover .add {
+    opacity: 1;
+  }
+
+  .add:hover {
+    background: var(--bg-card-hover);
+    box-shadow: var(--card-shadow-hover);
+  }
+}
+
+.add:active {
+  background: var(--bg-active);
+}
+
+:global(html[data-dnd-dragging]) .cell .add,
+:global(html[data-cal-resizing]) .cell .add {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Space reserved above the cell's own cards for the row's multi-day bar lanes (measured by WeekRow
+   when bars wrap: --lanes-h; else fixed one-line lanes). */
+.lanes {
+  flex: none;
+  height: var(--lanes-h, calc(var(--lanes, 0) * var(--cal-lane-h)));
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cardWrap {
+  min-width: 0;
+}
+
+/* ------------------------------------------------------------------ multi-day bars */
+.bars {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.barSlot {
+  position: absolute;
+  top: calc(var(--cal-head-h) + var(--lane, 0) * var(--cal-lane-h));
+  min-width: 0;
+  /* Only the bar itself takes the pointer (and not at all while dragging/resizing: see dnd.module.css). */
+  pointer-events: none;
+}
+
+.barSlot > * {
+  pointer-events: auto;
+}
+
+/* Wrapping bars: lanes are the rows of a 7-column grid (each as tall as its tallest bar), placed under
+   the date labels; its measured height (incl. the trailing gap) is what every cell reserves. */
+.barsWrap {
+  inset: var(--cal-head-h) 0 auto 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: auto;
+  align-items: start;
+  row-gap: var(--cal-card-gap);
+  padding-bottom: var(--cal-card-gap);
+}
+
+.barsWrap .barSlot {
+  position: relative;
+  top: auto;
+}
+
+.bar {
+  position: relative;
+}
+
+.barResizing,
+.barResizing:hover {
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* ------------------------------------------------------------------ resize handles (desktop) */
+.handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 6px;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.handleStart {
+  left: 0;
+}
+
+.handleEnd {
+  right: 0;
+}
+
+:global(html[data-cal-resizing]),
+:global(html[data-cal-resizing] *) {
+  cursor: ew-resize !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+:global(html[data-cal-resizing] [data-dnd-draggable]) {
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------------ inline composer */
+.composer {
+  margin: 0 var(--cal-cell-pad-x) var(--cal-card-gap);
+  padding: var(--cal-card-pad-y) var(--cal-card-pad-x);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  box-shadow: var(--card-shadow-hover);
+  animation: composerIn var(--dur) var(--ease) both;
+}
+
+@keyframes composerIn {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+}
+
+.composerInput {
+  display: block;
+  width: 100%;
+  min-height: var(--cal-card-line);
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: var(--cal-card-font);
+  font-weight: 500;
+  line-height: var(--cal-card-line);
+  overflow-wrap: anywhere;
+  resize: none;
+  box-shadow: none;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.composerInput:focus-visible {
+  box-shadow: none;
+}
+
+.composerInput::placeholder {
+  color: var(--text-placeholder);
+}
+
+@media (pointer: coarse) {
+  /* iOS zooms into inputs smaller than 16px. */
+  .composerInput {
+    font-size: 16px;
+    line-height: 20px;
+  }
+}
+
+/* ------------------------------------------------------------------ compact density (cells < 96px) */
+.compact {
+  --cal-row-min-h: 84px;
+  --cal-date-row-h: 24px;
+  --cal-head-h: 24px;
+  --cal-card-font: 11px;
+  --cal-card-line: 13px;
+  --cal-card-pad-y: 2px;
+  --cal-card-pad-x: 4px;
+  --cal-card-gap: 2px;
+  --cal-cell-pad-x: 2px;
+  --cal-lane-h: 19px;
+}
+
+.scroller.compact {
+  padding: 0;
+}
+
+.compact .grid {
+  border-left: 0;
+}
+
+.compact .head {
+  justify-content: center;
+  padding: 3px 0 0;
+}
+
+.compact .num {
+  height: 18px;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.compact .today {
+  min-width: 20px;
+  height: 20px;
+  margin: -1px 0 0;
+  padding: 0 3px;
+  border-radius: 10px;
+}
+
+.compact .cell {
+  padding-bottom: 4px;
+}
+
+/* ------------------------------------------------------------------ week view */
+.weekRoot {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.weekPane {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.weekHeader {
+  display: grid;
+  flex: none;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  height: 33px;
+  margin: 0 5px;
+  border-bottom: 1px solid var(--grid-line);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.weekHeader.compact {
+  height: 44px;
+  margin: 0;
+}
+
+.weekHeaderCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.weekHeader.compact .weekHeaderCell {
+  flex-direction: column;
+  gap: 1px;
+}
+
+.weekHeaderName {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.weekHeaderNum {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 4px;
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.weekHeaderToday {
+  background: var(--today);
+  color: var(--today-text);
+  font-weight: 500;
+}
+
+.weekScroll {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0 5px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-anchor: none;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.weekScroll.compact {
+  padding: 0;
+}
+
+.weekGrid {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  border-left: 1px solid var(--grid-line);
+}
+
+.weekScroll.compact .weekGrid {
+  border-left: 0;
+}
+
+.weekRow {
+  --cal-head-h: 8px;
+  flex: 1 0 auto;
+  min-height: 100%;
+}
+
+.weekRow .cell {
+  padding-bottom: 12px;
+}
+
+.weekHead {
+  flex: none;
+  height: var(--cal-head-h);
+}
+
+/* Notion board-style "+ New" under a week column's cards (hover). */
+.newRow {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  margin: 0 var(--cal-cell-pad-x);
+  padding: 0 6px;
+  border-radius: var(--radius);
+  color: var(--text-tertiary);
+  font-size: 14px;
+  opacity: 0;
+  transition:
+    opacity var(--dur-fast) var(--ease),
+    background-color var(--dur-instant) ease-in;
+}
+
+.newRow:focus-visible {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cell:hover .newRow {
+    opacity: 1;
+  }
+
+  .newRow:hover {
+    background: var(--bg-hover);
+  }
+}
+
+:global(html[data-dnd-dragging]) .cell .newRow,
+:global(html[data-cal-resizing]) .cell .newRow {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Touch devices: overlay-style scrolling with no scrollbar gutter (like the native app). */
+@media (pointer: coarse) {
+  .scroller,
+  .weekScroll {
+    scrollbar-width: none;
+  }
+
+  .scroller::-webkit-scrollbar,
+  .weekScroll::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}

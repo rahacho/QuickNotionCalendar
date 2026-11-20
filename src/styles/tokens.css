@@ -52,7 +52,9 @@
   --z-backdrop: 60;
   --z-peek: 70;
   --z-popover: 80;
-  --z-toast: 90;
+  /* Toasts sit above every modal surface (peek, nested sheets — see overlayZ in lib/layers) but below
+     popovers/menus, so an open menu is never covered by a passing toast. */
+  --z-toast: 78;
   --z-drag: 100;
 
   /* Fixed brand colors (same in both themes) */
@@ -126,15 +128,16 @@
   --bg-selected: rgba(35, 131, 226, 0.22);
   --bg-drop-target: rgba(35, 131, 226, 0.1);
 
-  --text: rgba(255, 255, 255, 0.81);
-  --text-secondary: rgba(255, 255, 255, 0.46);
+  /* text / text-secondary / grid-line / today: pixel-measured from the Notion reference screenshot. */
+  --text: rgb(240, 239, 237);
+  --text-secondary: rgb(125, 122, 117);
   --text-tertiary: rgba(255, 255, 255, 0.282);
   --text-placeholder: rgba(255, 255, 255, 0.282);
   --icon: rgba(255, 255, 255, 0.46);
 
   --border: rgba(255, 255, 255, 0.094);
   --border-strong: rgba(255, 255, 255, 0.14);
-  --grid-line: #2f2f2f;
+  --grid-line: rgb(56, 56, 53);
 
   --card-shadow: rgba(255, 255, 255, 0.075) 0 0 0 1px inset, rgba(0, 0, 0, 0.2) 0 2px 4px;
   --card-shadow-hover: rgba(255, 255, 255, 0.1) 0 0 0 1px inset, rgba(0, 0, 0, 0.25) 0 2px 6px;
@@ -157,4 +160,8 @@
   --toast-text: rgba(255, 255, 255, 0.9);
   --scrollbar-thumb: rgba(255, 255, 255, 0.12);
   --scrollbar-thumb-hover: rgba(255, 255, 255, 0.22);
+
+  /* Notion's dark today marker: coral circle, black digits. */
+  --today: rgb(229, 100, 89);
+  --today-text: rgb(0, 0, 0);
 }

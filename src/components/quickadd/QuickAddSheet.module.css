@@ -1,0 +1,116 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  padding: 0 16px 16px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 2px 0 12px 4px;
+}
+
+.heading {
+  min-width: 0;
+}
+
+.title {
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.subtitle {
+  margin-top: 1px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.inputRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  height: 44px;
+  padding: 0 48px 0 12px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  box-shadow: inset 0 0 0 1px var(--border);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 22px;
+  outline: none;
+  transition: box-shadow var(--dur-fast) var(--ease);
+}
+
+.input:focus,
+.input:focus-visible {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 57%, transparent),
+    0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.addBtn {
+  position: absolute;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-active);
+  color: var(--text-tertiary);
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+
+.addBtn svg {
+  color: inherit;
+}
+
+.addBtnReady {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.addBtnReady:active {
+  transform: scale(0.94);
+}
+
+.planned {
+  margin-top: 16px;
+}
+
+.plannedLabel {
+  padding: 0 4px 8px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Clips while the height animates; the inline padding keeps the card's shadow visible. */
+.item {
+  overflow: hidden;
+  padding: 1px 4px 0;
+  margin: -1px -4px 0;
+}
+
+.item > * {
+  cursor: pointer;
+}

@@ -1,0 +1,299 @@
+/* Shared by RepeatEditor and ReminderMenu (menus + small form panels inside popovers). */
+
+.menu {
+  min-width: 240px;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 260px;
+  max-width: 100%;
+  padding: 6px 12px 12px;
+}
+
+.repeatPanel {
+  width: 288px;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  margin: 0 -6px 4px;
+}
+
+.panelTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.formRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+}
+
+.formLabel {
+  flex: 0 0 44px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.formControl {
+  flex: 1;
+}
+
+.grow {
+  flex: 1;
+}
+
+.caption {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.sectionLabel {
+  margin: 10px 0 2px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Notion-ish dropdown made from a native <select> (native picker on iOS). */
+.selectWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.select {
+  width: 100%;
+  height: 28px;
+  padding: 0 26px 0 8px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--bg-input);
+  box-shadow: inset 0 0 0 1px var(--border);
+  color: var(--text);
+  font-size: 14px;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.select:focus-visible {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 57%, transparent),
+    0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.select option {
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.selectChevron {
+  position: absolute;
+  right: 8px;
+  pointer-events: none;
+}
+
+.numberInput {
+  width: 44px;
+  height: 28px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--bg-input);
+  box-shadow: inset 0 0 0 1px var(--border);
+  color: var(--text);
+  font-size: 14px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  transition: box-shadow var(--dur-fast) var(--ease);
+}
+
+.numberInput:focus,
+.numberInput:focus-visible {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 57%, transparent),
+    0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.chips {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 28px;
+  min-width: 0;
+  border-radius: var(--radius);
+  background: var(--bg-hover);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+@media (hover: hover) {
+  .chip:hover {
+    background: var(--bg-active);
+  }
+}
+
+.chipOn,
+.chipOn:hover {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.radios {
+  display: flex;
+  flex-direction: column;
+}
+
+.radioRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.radio {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex-shrink: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--checkbox-border);
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  transition: box-shadow var(--dur-fast) var(--ease);
+}
+
+.radio:checked {
+  box-shadow: inset 0 0 0 5px var(--accent);
+}
+
+.radio:focus-visible {
+  box-shadow:
+    inset 0 0 0 1.5px var(--checkbox-border),
+    var(--focus-ring);
+}
+
+.radio:checked:focus-visible {
+  box-shadow:
+    inset 0 0 0 5px var(--accent),
+    var(--focus-ring);
+}
+
+.inlineField {
+  height: 28px;
+  padding: 0 8px;
+  border-radius: var(--radius);
+  background: var(--bg-input);
+  box-shadow: inset 0 0 0 1px var(--border);
+  color: var(--text);
+  font-size: 14px;
+  white-space: nowrap;
+  transition: box-shadow var(--dur-fast) var(--ease);
+}
+
+@media (hover: hover) {
+  .inlineField:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.inlineFieldActive {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 57%, transparent),
+    0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.inlineFieldMuted {
+  color: var(--text-tertiary);
+}
+
+.panelFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.summary {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.panelFooter > :last-child {
+  margin-left: auto;
+}
+
+.calendarPopover {
+  padding: 4px 8px 8px;
+}
+
+@media (pointer: coarse) {
+  .select,
+  .numberInput,
+  .inlineField {
+    height: 34px;
+    font-size: 16px;
+  }
+
+  .chip {
+    height: 34px;
+    font-size: 13px;
+  }
+
+  .formRow {
+    min-height: 42px;
+  }
+
+  .radioRow {
+    min-height: 40px;
+    font-size: 15px;
+  }
+
+  .radio {
+    width: 18px;
+    height: 18px;
+  }
+
+  .radio:checked {
+    box-shadow: inset 0 0 0 5.5px var(--accent);
+  }
+
+  .panel,
+  .repeatPanel {
+    width: 100%;
+    min-width: 280px;
+  }
+}

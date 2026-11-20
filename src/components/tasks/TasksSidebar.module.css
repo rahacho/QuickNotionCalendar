@@ -1,0 +1,560 @@
+/*
+ * Left Tasks list — Notion sidebar look: --bg-sidebar (painted by AppShell / Drawer), 44px header,
+ * 12px/500 section headers, 30px rows with a 4px-radius hover, quiet tertiary meta.
+ */
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* ---- header ---- */
+.header {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--header-h);
+  /* Right 44px stay free for AppShell's hover-revealed « collapse button. */
+  padding: 0 44px 0 14px;
+}
+
+.headerDrawer {
+  padding-right: 8px;
+}
+
+.glyph {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius);
+  background: var(--bg-active);
+}
+
+.glyphIcon {
+  color: var(--text-secondary);
+}
+
+.headerTitle {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---- scrolling list ---- */
+.scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 8px 16px;
+}
+
+.group {
+  padding-top: 6px;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  text-align: left;
+}
+
+.groupToggle {
+  transition: background-color var(--dur-fast) var(--ease);
+}
+
+@media (hover: hover) {
+  .groupToggle:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.groupToggle:active {
+  background: var(--bg-active);
+}
+
+.groupTitle {
+  flex: none;
+  white-space: nowrap;
+}
+
+.groupSub {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-tertiary);
+  font-weight: 400;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.caret {
+  flex: none;
+  color: var(--icon);
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.caretOpen {
+  transform: rotate(90deg);
+}
+
+.groupCount {
+  flex: none;
+  margin-left: auto;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.groupCountInline {
+  flex: none;
+  color: var(--red-text);
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+
+.red {
+  color: var(--red-text);
+}
+
+.moveAll {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  margin-left: auto;
+  margin-right: -4px;
+  padding: 0 6px;
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+@media (hover: hover) {
+  .moveAll:hover {
+    background: var(--bg-hover);
+    color: var(--text);
+  }
+}
+
+.moveAll:active {
+  background: var(--bg-active);
+}
+
+.more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  padding: 4px 8px 2px 32px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* Older completions stay reachable (and can be unchecked) — nothing is ever out of reach. */
+.showMore {
+  height: 22px;
+  margin-left: -6px;
+  padding: 0 6px;
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color var(--dur-fast) var(--ease);
+}
+
+@media (hover: hover) {
+  .showMore:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.showMore:active {
+  background: var(--bg-active);
+}
+
+@media (pointer: coarse) {
+  .showMore {
+    height: 32px;
+  }
+}
+
+/* ---- rows ---- */
+.row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 30px;
+  padding: 5px 8px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  outline: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    opacity var(--dur-fast) var(--ease);
+}
+
+@media (hover: hover) {
+  .row:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.row:active {
+  background: var(--bg-active);
+}
+
+/* Keyboard focus sits on the title control; the ring is drawn around the whole row. */
+.row:has(.rowTitle:focus-visible) {
+  box-shadow: var(--focus-ring);
+}
+
+.rowCheck {
+  display: flex;
+  flex: none;
+  padding-top: 2px;
+}
+
+/* Title + meta: the meta sits right of the title while both fit, else wraps onto its own line under it
+   (never truncated). */
+.rowBody {
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  column-gap: 8px;
+  min-width: 0;
+}
+
+.rowTitle {
+  /* The meta stays beside the title while the title keeps ≥ 4em; a longer meta wraps below. */
+  flex: 1 1 4em;
+  min-width: 0;
+  outline: none;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 20px;
+  overflow-wrap: anywhere;
+  /* Strikethrough always present but transparent, so checking fades it in. */
+  text-decoration-line: line-through;
+  text-decoration-color: transparent;
+  transition:
+    color var(--dur) var(--ease),
+    text-decoration-color var(--dur) var(--ease);
+}
+
+.untitled {
+  color: var(--text-tertiary);
+}
+
+.rowChecked .rowTitle {
+  color: var(--text-tertiary);
+  text-decoration-color: var(--text-tertiary);
+}
+
+.rowMeta {
+  flex: 0 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 20px;
+  margin-left: auto;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 20px;
+  text-align: right;
+}
+
+.rowMetaText {
+  min-width: 0;
+}
+
+.rowMetaSeg {
+  white-space: nowrap;
+}
+
+.rowRepeat {
+  display: block;
+  flex: none;
+  color: var(--icon);
+}
+
+.rowOverdue .rowMeta {
+  color: var(--red-text);
+}
+
+.rowDragging {
+  opacity: 0.35;
+}
+
+/* ---- empty state ---- */
+.empty {
+  padding: 18px 8px 8px;
+}
+
+.emptyTitle {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.emptyText {
+  margin-top: 2px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* ---- footer ---- */
+.footer {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  padding: 4px 8px 8px;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  transition: background-color var(--dur-fast) var(--ease);
+}
+
+@media (hover: hover) {
+  .navItem:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.navItem:active {
+  background: var(--bg-active);
+}
+
+.navIcon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.navLabel {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---- sync status (footer, only when something is off) ---- */
+.sync {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 4px 8px;
+}
+
+.syncIcon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+}
+
+.syncDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+}
+
+.syncDotError {
+  background: var(--red-text);
+}
+
+.syncDotOffline {
+  background: var(--text-tertiary);
+}
+
+.syncDotPending {
+  background: var(--accent);
+  animation: syncPulse 1.4s var(--ease) infinite;
+}
+
+@keyframes syncPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.syncText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.syncLabel {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.syncDetail {
+  overflow: hidden;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  line-height: 14px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ---- "Reminders are off on this device · Turn on" (footer; push off while alerts are planned) ---- */
+.pushHint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 30px;
+  padding: 4px 8px;
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+  text-align: left;
+  transition: background-color var(--dur-fast) var(--ease);
+}
+
+@media (hover: hover) {
+  .pushHint:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.pushHint:active {
+  background: var(--bg-active);
+}
+
+.pushHintText {
+  min-width: 0;
+}
+
+.pushHintAction {
+  color: var(--accent);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ---- touch: comfortable targets in the phone/tablet drawer ---- */
+@media (pointer: coarse) {
+  .row {
+    min-height: 40px;
+    padding: 10px 8px;
+  }
+
+  .groupHeader {
+    height: 34px;
+  }
+
+  .moveAll {
+    height: 28px;
+    padding: 0 8px;
+  }
+
+  .navItem {
+    height: 40px;
+  }
+
+  .pushHint {
+    min-height: 40px;
+  }
+}
+
+/* ---- animated wrappers (height/opacity presence; overflow toggled by motion) ---- */
+.rowWrap,
+.emptyWrap,
+.syncWrap {
+  position: relative;
+}
+
+.inDrawer .header {
+  padding-left: 16px;
+}
+
+/* Hairlines appear only where list content actually runs under the header / footer. */
+.header::after,
+.footer::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--border);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+.header::after {
+  bottom: 0;
+}
+
+.footer::before {
+  top: 0;
+}
+
+.root[data-scrolled] .header::after,
+.root[data-more-below] .footer::before {
+  opacity: 1;
+}

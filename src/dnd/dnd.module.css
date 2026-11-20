@@ -1,0 +1,58 @@
+/* DragOverlay wrapper: never intercepts hit-testing (drop targets are found under the pointer). */
+.overlay {
+  pointer-events: none;
+}
+
+.overlayCard {
+  animation: lift var(--dur-fast) var(--ease) both;
+}
+
+/* A dragged multi-day bar keeps its one-line look, fills the overlay box, and lifts like a card. */
+.overlayBar.overlayBar {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow-drag);
+  cursor: grabbing;
+  animation: lift var(--dur-fast) var(--ease) both;
+}
+
+@keyframes lift {
+  from {
+    box-shadow: var(--card-shadow);
+  }
+  to {
+    box-shadow: var(--card-shadow-drag);
+  }
+}
+
+/* Over a target that refuses the drop (a repeating occurrence over the Inbox). */
+.refused.refused {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Insertion line for cross-container drops (Notion's blue drop line). */
+.line {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: var(--z-drag);
+  height: 2px;
+  border-radius: 1px;
+  background: var(--accent);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* While a drag is in flight: one grabbing cursor everywhere, and draggables (cards, bars, bubbles,
+   rows) stop hovering / intercepting so the element under the pointer is the drop container. */
+:global(html[data-dnd-dragging]),
+:global(html[data-dnd-dragging] *) {
+  cursor: grabbing !important;
+}
+
+:global(html[data-dnd-dragging] [data-dnd-draggable]) {
+  pointer-events: none;
+}

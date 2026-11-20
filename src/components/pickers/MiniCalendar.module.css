@@ -1,0 +1,196 @@
+.root {
+  --mc-cell-h: 30px;
+  display: flex;
+  flex-direction: column;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+  padding: 0 0 0 6px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.todayBtn {
+  height: 24px;
+  padding: 0 6px;
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 24px;
+  transition: background-color var(--dur-instant) ease-in;
+}
+
+@media (hover: hover) {
+  .todayBtn:hover {
+    background: var(--bg-hover);
+  }
+}
+
+.todayBtn:active {
+  background: var(--bg-active);
+}
+
+/* Touch: ‹ › get 36×32 boxes 4px apart, extended only vertically (40×44 targets), so neither
+   reaches over its neighbour (IconButton's generic touch extension would). */
+@media (pointer: coarse) {
+  .nav {
+    gap: 4px;
+  }
+
+  .nav .navBtn {
+    width: 36px;
+    height: 32px;
+  }
+
+  .nav .navBtn::after {
+    inset: -6px -2px;
+  }
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  height: 28px;
+  align-items: center;
+}
+
+.weekday {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  outline: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.cell {
+  position: relative;
+  height: var(--mc-cell-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Range band: a continuous light strip behind the days; rounded where the range starts/ends. */
+.band::before {
+  content: '';
+  position: absolute;
+  top: 1px;
+  bottom: 1px;
+  left: 0;
+  right: 0;
+  background: var(--bg-selected);
+}
+
+.bandStart::before {
+  left: 2px;
+  border-top-left-radius: var(--radius);
+  border-bottom-left-radius: var(--radius);
+}
+
+.bandEnd::before {
+  right: 2px;
+  border-top-right-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+}
+
+.bandRowStart:not(.bandStart)::before {
+  left: 2px;
+}
+
+.bandRowEnd:not(.bandEnd)::before {
+  right: 2px;
+}
+
+.day {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 4px);
+  height: calc(100% - 2px);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color var(--dur-instant) ease-in,
+    color var(--dur-instant) ease-in;
+}
+
+@media (hover: hover) {
+  .day:hover:not(:disabled) {
+    background: var(--bg-hover);
+  }
+}
+
+.day:active:not(:disabled) {
+  background: var(--bg-active);
+}
+
+.day:focus-visible {
+  box-shadow: var(--focus-ring);
+}
+
+.outside {
+  color: var(--text-tertiary);
+}
+
+.today {
+  color: var(--red-text);
+  font-weight: 500;
+}
+
+.selected,
+.selected:hover,
+.selected:active {
+  background: var(--accent) !important;
+  color: var(--accent-text);
+  font-weight: 500;
+}
+
+.day:disabled {
+  color: var(--text-placeholder);
+  opacity: 0.5;
+  cursor: default;
+}
+
+@media (pointer: coarse) {
+  .root {
+    --mc-cell-h: 38px;
+  }
+
+  .day {
+    font-size: 15px;
+  }
+
+  .header {
+    height: 36px;
+  }
+}

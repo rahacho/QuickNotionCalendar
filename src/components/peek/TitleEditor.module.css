@@ -1,0 +1,40 @@
+.title {
+  display: block;
+  width: 100%;
+  min-height: 1.2em;
+  margin: 0;
+  padding: 3px 2px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 32px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  resize: none;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  outline: none;
+  box-shadow: none;
+  caret-color: var(--text);
+}
+
+.title:focus-visible {
+  box-shadow: none;
+}
+
+.title::placeholder {
+  color: var(--text-placeholder);
+}
+
+.sheet {
+  font-size: 26px;
+}
+
+@media (pointer: coarse) {
+  .title {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+}

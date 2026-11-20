@@ -1,0 +1,65 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-backdrop);
+  background: var(--backdrop);
+  touch-action: none;
+}
+
+.panel {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: var(--z-peek);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: var(--bg-elevated);
+  box-shadow: var(--popover-shadow);
+  color: var(--text);
+  outline: none;
+  overflow: hidden;
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  will-change: transform;
+}
+
+.panel:focus-visible {
+  box-shadow: var(--popover-shadow);
+}
+
+.handleArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 22px;
+  touch-action: none;
+  cursor: grab;
+}
+
+.handleArea:active {
+  cursor: grabbing;
+}
+
+.handle {
+  width: 36px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--text-placeholder);
+}
+
+.body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.full .body {
+  flex: 1;
+}
